@@ -1,0 +1,449 @@
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+
+public class UsingfileWriting extends Application {
+    static final int SEATING_CAPACITY = 42;                                                     //maximum number of seats.
+    private ArrayList<String> AllBookedSeats = new ArrayList<String>();                         //array list for store All Booked seats.
+    private HashMap<String, ArrayList> CustomerBookings = new HashMap<String, ArrayList>();     //HashMap tp store customer name and booked seats.
+    private ArrayList<String> BookedSeatsFromHashMap = new ArrayList<String>();                 //Array list to get only specific Customer booked seats from the HashMap.
+    private String customer="";                                                                 //Customer name.
+    private Arrays id[] = new Arrays[SEATING_CAPACITY];                                         //to save ids.
+    private ArrayList<Button> GuiSeats = new ArrayList<Button>();                               //arraylist for Gui Button creation
+
+    private void addSeats(){
+        ArrayList<String> TempSeatBooking = new ArrayList<String>();                            //Temporary Array list to get Customer bookings.
+
+        //getting customer name
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Please Enter the Customer Name :");
+        String customer = scanner.next();
+        System.out.print("Enter the customer National ID number : ");
+        String id = scanner.next();
+
+
+
+        Button btnConfirm = new Button(" Confirm ");
+        Label label = new Label("\t      Train Booking Menu\n\t customer name : "+customer);
+        Label colorLabel = new Label("Booked");
+        Rectangle rectangle = new Rectangle(15,15);
+        rectangle.setStyle("-fx-fill: #958feb");
+
+
+        //adding elements to the created panes
+        BorderPane borderPane = new BorderPane();
+        GridPane gridPaneLeft = new GridPane();
+        GridPane gridPaneRight = new GridPane();
+        GridPane gridPaneBottom = new GridPane();
+        GridPane gridPaneTop = new GridPane();
+        borderPane.setLeft(gridPaneLeft);
+        borderPane.setRight(gridPaneRight);
+        borderPane.setTop(gridPaneTop);
+        borderPane.setBottom(gridPaneBottom);
+
+
+        gridPaneBottom.add(btnConfirm, 12, 1);              //connfitm button
+        gridPaneTop.add(label,9,1);                         //Heading Label
+        gridPaneBottom.add(rectangle,1,1);                  //Map Legend Color
+        gridPaneBottom.add(colorLabel,2,1);                 //Color Label
+
+        //Alligining created panes.
+        gridPaneLeft.setHgap(10);
+        gridPaneLeft.setVgap(10);
+        gridPaneLeft.setPadding(new Insets(60,10,100,150));
+        gridPaneRight.setHgap(10);
+        gridPaneRight.setVgap(10);
+        gridPaneBottom.setHgap(2);
+        gridPaneRight.setPadding(new Insets(60,150,100,10));
+        gridPaneBottom.setPadding(new Insets(0,150,10,150));
+        gridPaneTop.setPadding(new Insets(10,60,0,0));
+        gridPaneRight.setAlignment(Pos.CENTER);
+        gridPaneLeft.setAlignment(Pos.CENTER);
+        gridPaneBottom.setAlignment(Pos.CENTER);
+        gridPaneTop.setAlignment(Pos.CENTER);
+
+        //Button creation for seats using loop
+        int buttonCount = 0;                                            //to give the button number
+        for(int row = 1; row<=7; row++) {
+            for (int column = 1; column <= 6; column++) {
+                buttonCount++;
+                Button button = new Button("" + buttonCount);
+                GuiSeats.add(button);                                  //adding buttons to the array
+                button.setPrefSize(30, 30);       //setting a default size for each buttons
+                if (column < 4) {                                      //shifiting left and write by the column number
+                    gridPaneLeft.add(button, column, row);
+                } else if (column>=4){
+                    gridPaneRight.add(button, column, row);
+                }
+            }
+        }
+
+        //setting a new scene
+        Scene scene = new Scene(borderPane, 600, 700);         //Setting the default pane and giving the resolution.
+        Stage seatStage = new Stage();
+
+        //adding all the created button into a array to perform the each-for-loop.
+
+        for (Button eachButton : GuiSeats) {                                        //for each button inside the array it will perform the same onclick action repeatedly.
+            boolean ans = AllBookedSeats.contains(eachButton.getText());              //Checking is there any already booked seats from the AllBookedSeats Array .
+            if(ans){                                                                  //if True will perform the bellow action to the already booked seat.(Button).
+                eachButton.setDisable(true);                                          //Making booked seat number button non-clickable.
+                eachButton.setStyle("-fx-background-color: Blue");                    //Setting a color to the disabled button.
+            }
+            eachButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    eachButton.setDisable(true);                      //making button disable after the click.
+                    eachButton.setStyle("-fx-background-color: red"); //setting disable color to red after click.
+                    System.out.print(" " + eachButton.getText());     //Giving console output of the booked seats.
+
+                    AllBookedSeats.add(eachButton.getText());                  //adding booked seat number to the AllBookedSeats Array.
+                    TempSeatBooking.add(eachButton.getText());                 //adding booked seat number to temporary array to pass the value to the HashMap.
+                    CustomerBookings.put(customer, TempSeatBooking);           //completing customer booking with name and booked seats.
+                }
+            });
+        }
+
+        //Creating a event Handler to perform the exit of the Gui Window.
+        btnConfirm.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                seatStage.close();        //closing the current stage.
+            }
+        });
+        seatStage.setTitle("Train Booking Menu");                            //Giving window name.
+        seatStage.setScene(scene);                                           //setting stage to the scene.
+        seatStage.showAndWait();                                             //Showing and Holding window until completing the specific task.
+    }
+
+
+    private void viewSeats(){
+
+        Button btnDone = new Button(" Done ");
+        Label label = new Label("\t      Train Booking Menu\n\t\t     View Seats");
+        Label colorLabel = new Label("Booked");
+        Rectangle rectangleBooked = new Rectangle(15,15);
+        rectangleBooked.setStyle("-fx-fill: #958feb");
+        Rectangle rectangleFree = new Rectangle(15,15);
+        rectangleFree.setStyle("-fx-fill: #97cfa6");
+        Label colorLabel2 = new Label(" Available");
+
+        //adding elements to the created panes
+        BorderPane borderPane = new BorderPane();
+        GridPane gridPaneLeft = new GridPane();
+        GridPane gridPaneRight = new GridPane();
+        GridPane gridPaneBottom = new GridPane();
+        GridPane gridPaneTop = new GridPane();
+        borderPane.setLeft(gridPaneLeft);
+        borderPane.setRight(gridPaneRight);
+        borderPane.setTop(gridPaneTop);
+        borderPane.setBottom(gridPaneBottom);
+
+
+
+        gridPaneBottom.add(btnDone, 35, 1);
+        gridPaneTop.add(label,9,1);
+        gridPaneBottom.add(rectangleBooked,1,1);
+        gridPaneBottom.add(colorLabel,2,1);
+        gridPaneBottom.add(rectangleFree,8,1);
+        gridPaneBottom.add(colorLabel2,9,1);
+
+        //Alligining created panes.
+        gridPaneLeft.setHgap(10);
+        gridPaneLeft.setVgap(10);
+        gridPaneLeft.setPadding(new Insets(60,10,100,150));
+        gridPaneRight.setHgap(10);
+        gridPaneRight.setVgap(10);
+        gridPaneBottom.setHgap(2);
+        gridPaneRight.setPadding(new Insets(60,150,100,10));
+        gridPaneBottom.setPadding(new Insets(0,150,10,150));
+        gridPaneTop.setPadding(new Insets(10,60,0,0));
+        gridPaneRight.setAlignment(Pos.CENTER);
+        gridPaneLeft.setAlignment(Pos.CENTER);
+        gridPaneBottom.setAlignment(Pos.CENTER);
+        gridPaneTop.setAlignment(Pos.CENTER);
+
+        //Button creation for seats using loop
+        int buttonCount = 0;                                            //to give the button number
+        for(int row = 1; row<=7; row++) {
+            for (int column = 1; column <= 6; column++) {
+                buttonCount++;
+                Button button = new Button("" + buttonCount);
+                GuiSeats.add(button);                                  //adding buttons to the array
+                button.setPrefSize(30, 30);       //setting a default size for each buttons
+                if (column < 4) {                                      //shifiting left and write by the column number
+                    gridPaneLeft.add(button, column, row);
+                } else if (column>=4){
+                    gridPaneRight.add(button, column, row);
+                }
+            }
+        }
+
+
+        //setting a new pane
+        Scene scene = new Scene(borderPane, 600, 700);
+        Stage viewSeatStage = new Stage();
+
+
+
+        //creating array for the onclick book action
+        for (Button eachButton : GuiSeats) {           //for each button inside the array it will perform the same onclick action
+            boolean ans = AllBookedSeats.contains(eachButton.getText());      //getting values from booked seats array to check the booked seats
+            if(ans){
+                eachButton.setDisable(true);
+                eachButton.setStyle("-fx-background-color: Blue");                   //making booked seats as blue color
+            }
+            else{
+                eachButton.setDisable(true);
+                eachButton.setStyle("-fx-background-color: green");                    //showing available seats
+            }
+
+
+        };
+
+        //confirm exit
+        btnDone.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                viewSeatStage.close();
+            }
+        });
+
+        viewSeatStage.setTitle("Train Booking Menu");                       //Giving window name.
+        viewSeatStage.setScene(scene);                                      //setting stage to the scene.
+        viewSeatStage.showAndWait();                                        //Showing and Holding window until completing the specific task.
+    }
+
+
+    private void viewEmptySeats(){
+
+        Button btnConfirm = new Button(" Done ");
+        Label label = new Label("\t      Train Booking Menu\n\t\t    Empty seats");
+
+        //adding elements to the created panes
+        BorderPane borderPane = new BorderPane();
+        GridPane gridPaneLeft = new GridPane();
+        GridPane gridPaneRight = new GridPane();
+        GridPane gridPaneBottom = new GridPane();
+        GridPane gridPaneTop = new GridPane();
+        borderPane.setLeft(gridPaneLeft);
+        borderPane.setRight(gridPaneRight);
+        borderPane.setTop(gridPaneTop);
+        borderPane.setBottom(gridPaneBottom);
+
+
+        gridPaneBottom.add(btnConfirm, 12, 1);
+        gridPaneTop.add(label,9,1);
+
+        //Alligining created panes.
+        gridPaneLeft.setHgap(10);
+        gridPaneLeft.setVgap(10);
+        gridPaneLeft.setPadding(new Insets(60,10,100,150));
+        gridPaneRight.setHgap(10);
+        gridPaneRight.setVgap(10);
+        gridPaneBottom.setHgap(2);
+        gridPaneRight.setPadding(new Insets(60,150,100,10));
+        gridPaneBottom.setPadding(new Insets(0,150,10,150));
+        gridPaneTop.setPadding(new Insets(10,60,0,0));
+        gridPaneRight.setAlignment(Pos.CENTER);
+        gridPaneLeft.setAlignment(Pos.CENTER);
+        gridPaneBottom.setAlignment(Pos.CENTER);
+        gridPaneTop.setAlignment(Pos.CENTER);
+
+        //Button creation for seats using loop
+        int buttonCount = 0;                                            //to give the button number
+        for(int row = 1; row<=7; row++) {
+            for (int column = 1; column <= 6; column++) {
+                buttonCount++;
+                Button button = new Button("" + buttonCount);
+                GuiSeats.add(button);                                  //adding buttons to the array
+                button.setPrefSize(30, 30);       //setting a default size for each buttons
+                if (column < 4) {                                      //shifiting left and write by the column number
+                    gridPaneLeft.add(button, column, row);
+                } else if (column>=4){
+                    gridPaneRight.add(button, column, row);
+                }
+            }
+        }
+
+
+        //setting new scene
+        Scene scene = new Scene(borderPane, 600, 700);
+        Stage emptySeatStage = new Stage();
+
+
+
+
+        //creating array for the onclick book action
+        for (Button eachButton : GuiSeats) {           //for each button inside the array it will perform the same onclick action.
+            boolean ans = AllBookedSeats.contains(eachButton.getText());      //getting values from hashmap to a array to check the booked seats.
+            if(ans){
+                eachButton.setVisible(false);                                 //if a seat is booked it will hide the button from the pane.
+            }
+
+
+
+        };
+
+        //confirm exit
+        btnConfirm.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                emptySeatStage.close();
+            }
+        });
+
+
+        emptySeatStage.setTitle("Train Booking Menu");              //giving a window name.
+        emptySeatStage.setScene(scene);                             //setting the scene to the stage.
+        emptySeatStage.showAndWait();                               //Showing and Holding window until completing the specific task.
+    }
+
+    private void deleteCustomer(){
+        System.out.print("Enter the customer name : ");
+        Scanner sc = new Scanner(System.in);
+        String toDelete = sc.nextLine();
+        BookedSeatsFromHashMap = CustomerBookings.get(toDelete);  //assigning customer booked seats to a new list to delete from both Allbookedseats and CustomerBookings
+        deleteMenu:
+        while(true){
+            System.out.println("Customer "+toDelete+" has booked "+BookedSeatsFromHashMap+"\nSelect bellow option to delete: ");
+            System.out.println("\tTo Delete All booked Seats ENTER (1)");
+            System.out.println("\tTo Delete Seat by Seat ENTER (2)");
+            System.out.print("\tExit ENTER(3) : ");
+            int deleteOption = sc.nextInt();
+            switch (deleteOption) {                                //getting user delete option
+                case 1:
+                    CustomerBookings.remove(toDelete);                        //deleting customer booked seats from the CustomerBookings(HashMap)
+                    for (String del : BookedSeatsFromHashMap) {               //for each element in the assigned BookedSeatsFromHashMap (key values from HashMap)
+                        AllBookedSeats.remove(del);                           //it will delete the each element from the AllbookedSeat list
+                    }
+                    break deleteMenu;                                         //will exit the delete menu
+                case 2:
+                    System.out.print("Enter the seat number to delete :");
+                    String seatNumber = sc.next();                                              //getting seat number which is want to delete
+                    BookedSeatsFromHashMap.remove(seatNumber);                                  //removing seat number from the CustomerBookings (HashMap)
+                    AllBookedSeats.remove(seatNumber);                                          //removing seat number from the AllBookedSeat Array
+                    System.out.println("Seat number "+seatNumber+" deleted successful");        //output message
+                    break;
+                case 3:
+                    break deleteMenu;                                                           //will exit the delete menu
+            }
+
+        }
+    }
+
+    private void findSeat(){
+        System.out.print("Enter the customer name to find the booked seats : ");
+        Scanner sc = new Scanner(System.in);
+        String find = sc.nextLine();
+        System.out.println("Customer "+find+" has booked = "+" "+String.join(" ",CustomerBookings.get(find))+" seats.");   //finding Customer booked seats from the CustomerBookings HashMap.
+
+    }
+
+    private void seatsOrder() {
+        String tempName;                                                                        //Temporary name for the sorting process
+        String names[] = CustomerBookings.keySet().toArray(new String[0]);                       //Getting customer names from the HashMap to a String Array
+        System.out.println("----Seats Successfully Sorted by Customer Name----");
+        //Comparing Customer name With each other using ASCII values
+        for (int firstName = 0; firstName < names.length; firstName++) {
+            for (int secondName = firstName + 1; secondName < names.length; secondName++) {
+                if (names[secondName].compareTo(names[firstName]) < 0) {
+                    tempName = names[firstName];
+                    names[firstName] = names[secondName];
+                    names[secondName] = tempName;
+                }
+            }
+            //using string.join to remove the brackets
+            System.out.print(" "+String.join(" ",CustomerBookings.get(names[firstName])));          //calling the values(seat numbers) from the sorted customer name
+        }
+    }
+
+
+    private void storeDate() throws IOException {
+        FileWriter fileWriter = new FileWriter("trainbookings.txt");
+        fileWriter.write(String.valueOf(CustomerBookings.keySet()));
+        fileWriter.close();
+        System.out.println("File writing Complete!");
+    }
+
+    private void loadData(){}
+
+    public static void main(String[] args) {
+        launch();
+    }
+
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {                        //calling the main menu method.
+        Scanner scanner = new Scanner(System.in);
+        menu:
+        while (true){
+            System.out.println("\n----------Welcome to Train Ticket Booking System----------");
+            System.out.println("1.Enter (V) to view all the seats");
+            System.out.println("2.Enter (E) to view empty seats");
+            System.out.println("3.Enter (A) to add a customer");
+            System.out.println("4.Enter (D) to delete a customer");
+            System.out.println("5.Enter (F) to find a seat by customer name");
+            System.out.println("6.Enter (O) to view ordered seats by customer name");
+            System.out.println("7.Enter (S) to store data into a file");
+            System.out.println("8.Enter (L) to load data from a file ");
+            System.out.println("9/Enter (Q) to Quit the programme");
+            System.out.print("Enter Selected Letter : ");       //Getting user option.
+            String option = scanner.next();
+
+            switch (option){                                    //Switching user option.
+                case "V":
+                case "v":
+                    viewSeats();                                //calling Gui method to view the seats.
+                    break;
+                case "E":
+                case "e":
+                    viewEmptySeats();                          //calling Gui method to view the empty seats.
+                    break;
+                case "A":
+                case "a":
+                    addSeats();                                //calling Gui method to book a seat.
+                    break;
+                case "D":
+                case "d":
+                    deleteCustomer();
+                    break;
+                case "F":
+                case "f":
+                    findSeat();                                //calling method to find seat by user using console.
+                    break;
+                case "O":
+                case "o":
+                    seatsOrder();                            //calling sorting method.
+                    break;
+                case "S":
+                case "s":
+                    storeDate();                             //calling method to store data into a file.v
+                    break;
+                case "L":
+                case "l":
+                    //loadData();                              //calling method to load data from a external file.
+                    break;
+                case "Q":
+                case "q":
+                    break menu;                                //quiting programme.
+            }
+        }
+    }
+}
+
