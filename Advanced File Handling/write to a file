@@ -1,0 +1,36 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Main {
+    public static void main(String[] args) {
+        FileWriter fileWriter;
+
+        HashMap<String, ArrayList<String>> names = new HashMap<>();
+        ArrayList<String> seats = new ArrayList<>();
+        seats.add("56");
+        seats.add("45");
+        names.put("andrew", seats);
+        names.put("ryan", seats);
+        System.out.println(names);
+        
+        //WRITING TO DATA TO THE FILE
+       
+        try {
+            fileWriter = new FileWriter("C:/Users/andre/Desktop/Advanced File Handling/test.txt");
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            String tempName;
+            String tempSeat;
+            String keys[] = names.keySet().toArray(new String[0]);
+            System.out.println(keys);
+            //bufferedWriter.write(String.valueOf(names.keySet()));
+            //bufferedWriter.newLine();
+            for (String customer : keys) {
+                bufferedWriter.write(customer + ":" + String.join(",", names.get(customer)));
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
