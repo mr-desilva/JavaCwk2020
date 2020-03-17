@@ -1,0 +1,2 @@
+99:Colombo_to_Badulla
+90:Badulla_to_Colombo
